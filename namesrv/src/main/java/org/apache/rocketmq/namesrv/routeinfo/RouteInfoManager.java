@@ -105,6 +105,7 @@ public class RouteInfoManager {
         return topicList.encode();
     }
 
+    //ls:处理注册和心跳
     public RegisterBrokerResult registerBroker(
         final String clusterName,
         final String brokerAddr,
@@ -117,6 +118,7 @@ public class RouteInfoManager {
         RegisterBrokerResult result = new RegisterBrokerResult();
         try {
             try {
+                //ls:拿到写锁
                 this.lock.writeLock().lockInterruptibly();
 
                 Set<String> brokerNames = this.clusterAddrTable.get(clusterName);
@@ -125,10 +127,11 @@ public class RouteInfoManager {
                     this.clusterAddrTable.put(clusterName, brokerNames);
                 }
                 brokerNames.add(brokerName);
-
+                //ls:第一次应该是注册,之后应该是心跳
                 boolean registerFirst = false;
 
                 BrokerData brokerData = this.brokerAddrTable.get(brokerName);
+                //ls:处理brokerData
                 if (null == brokerData) {
                     registerFirst = true;
                     brokerData = new BrokerData(clusterName, brokerName, new HashMap<Long, String>());
@@ -161,7 +164,7 @@ public class RouteInfoManager {
                         }
                     }
                 }
-
+                //ls:upsert更新info中的时间戳是重点
                 BrokerLiveInfo prevBrokerLiveInfo = this.brokerLiveTable.put(brokerAddr,
                     new BrokerLiveInfo(
                         System.currentTimeMillis(),
