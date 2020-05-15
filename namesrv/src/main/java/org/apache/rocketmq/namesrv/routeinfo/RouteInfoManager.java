@@ -432,6 +432,7 @@ public class RouteInfoManager {
         return null;
     }
 
+    //ls:心跳检测现场 120s失效
     public void scanNotActiveBroker() {
         Iterator<Entry<String, BrokerLiveInfo>> it = this.brokerLiveTable.entrySet().iterator();
         while (it.hasNext()) {

@@ -886,7 +886,7 @@ public class BrokerController {
             handleSlaveSynchronize(messageStoreConfig.getBrokerRole());
             this.registerBrokerAll(true, false, true);
         }
-        //ls:broker向nameserver发送心跳,
+        //ls:broker向nameserver发送心跳,每隔10s
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override
