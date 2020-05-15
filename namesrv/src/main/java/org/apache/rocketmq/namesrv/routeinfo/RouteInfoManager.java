@@ -45,14 +45,20 @@ import org.apache.rocketmq.common.protocol.route.TopicRouteData;
 import org.apache.rocketmq.common.sysflag.TopicSysFlag;
 import org.apache.rocketmq.remoting.common.RemotingUtil;
 
+//ls:路由元数据信息管理
 public class RouteInfoManager {
     private static final InternalLogger log = InternalLoggerFactory.getLogger(LoggerName.NAMESRV_LOGGER_NAME);
     private final static long BROKER_CHANNEL_EXPIRED_TIME = 1000 * 60 * 2;
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    //ls:Topic 消息队列路由信息，消息发送时根据路由表进行负载均衡
     private final HashMap<String/* topic */, List<QueueData>> topicQueueTable;
+    //ls:Broker 基础信息， 包含 brokerName、 所属集群名称 、 主备 Broker地址
     private final HashMap<String/* brokerName */, BrokerData> brokerAddrTable;
+    //ls:Broker 集群信息，存储集群中所有 Broker 名称
     private final HashMap<String/* clusterName */, Set<String/* brokerName */>> clusterAddrTable;
+    //ls:Broker 状态信息 。 NameServer 每次 收到心跳包时会 替换该信 息
     private final HashMap<String/* brokerAddr */, BrokerLiveInfo> brokerLiveTable;
+    //ls:Broker上的 FilterServer列表
     private final HashMap<String/* brokerAddr */, List<String>/* Filter Server */> filterServerTable;
 
     public RouteInfoManager() {
@@ -752,7 +758,9 @@ public class RouteInfoManager {
     }
 }
 
+//ls:存活状态信息
 class BrokerLiveInfo {
+    //ls:心跳检查更新时间戳
     private long lastUpdateTimestamp;
     private DataVersion dataVersion;
     private Channel channel;
