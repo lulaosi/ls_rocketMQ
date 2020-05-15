@@ -41,6 +41,7 @@ import org.apache.rocketmq.srvutil.ServerUtil;
 import org.apache.rocketmq.srvutil.ShutdownHookThread;
 import org.slf4j.LoggerFactory;
 
+//ls:nameServer启动类
 public class NamesrvStartup {
 
     private static InternalLogger log;
@@ -54,7 +55,9 @@ public class NamesrvStartup {
     public static NamesrvController main0(String[] args) {
 
         try {
+            //ls:构建controller
             NamesrvController controller = createNamesrvController(args);
+            //ls:完成配置之后启动controller
             start(controller);
             String tip = "The Name Server boot success. serializeType=" + RemotingCommand.getSerializeTypeConfigInThisServer();
             log.info(tip);
@@ -78,7 +81,7 @@ public class NamesrvStartup {
             System.exit(-1);
             return null;
         }
-
+        //ls:解析nameserver Nettyserver参数
         final NamesrvConfig namesrvConfig = new NamesrvConfig();
         final NettyServerConfig nettyServerConfig = new NettyServerConfig();
         nettyServerConfig.setListenPort(9876);
