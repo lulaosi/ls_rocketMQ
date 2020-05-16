@@ -59,6 +59,7 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
     /**
      * Wrapping internal implementations for virtually all methods presented in this class.
      */
+    //ls:持有一个实现类 具体逻辑在里面
     protected final transient DefaultMQProducerImpl defaultMQProducerImpl;
     private final InternalLogger log = ClientLogger.getLog();
     /**
@@ -69,6 +70,9 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
      *
      * See {@linktourl http://rocketmq.apache.org/docs/core-concept/} for more discussion.
      */
+    //ls:以下是生产端的重要属性 topic 超时 重试等
+
+
     private String producerGroup;
 
     /**
@@ -268,6 +272,7 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
     @Override
     public void start() throws MQClientException {
         this.setProducerGroup(withNamespace(this.producerGroup));
+        //ls:defaultMQProducerImpl
         this.defaultMQProducerImpl.start();
         if (null != traceDispatcher) {
             try {

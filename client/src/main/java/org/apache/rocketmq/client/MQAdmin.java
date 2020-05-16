@@ -33,6 +33,7 @@ public interface MQAdmin {
      * @param newTopic topic name
      * @param queueNum topic's queue number
      */
+    //ls:producer顶层接口
     void createTopic(final String key, final String newTopic, final int queueNum)
         throws MQClientException;
 
