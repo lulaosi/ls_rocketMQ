@@ -380,6 +380,7 @@ public class RouteInfoManager {
         }
     }
 
+    //ls:broker会定时获取topic路由信息
     public TopicRouteData pickupTopicRouteData(final String topic) {
         TopicRouteData topicRouteData = new TopicRouteData();
         boolean foundQueueData = false;
