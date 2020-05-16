@@ -22,13 +22,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+//ls:消息定义
 public class Message implements Serializable {
     private static final long serialVersionUID = 8445773977080406428L;
 
     private String topic;
+    //ls:flag MessageFlag
     private int flag;
+    //ls:主要配置的是扩展信息 包括tag delay等
     private Map<String, String> properties;
     private byte[] body;
+    //ls:事务id
     private String transactionId;
 
     public Message() {

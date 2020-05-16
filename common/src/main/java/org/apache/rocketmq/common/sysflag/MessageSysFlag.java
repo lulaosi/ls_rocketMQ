@@ -16,7 +16,9 @@
  */
 package org.apache.rocketmq.common.sysflag;
 
+//ls:flag定义
 public class MessageSysFlag {
+
     public final static int COMPRESSED_FLAG = 0x1;
     public final static int MULTI_TAGS_FLAG = 0x1 << 1;
     public final static int TRANSACTION_NOT_TYPE = 0;
