@@ -117,6 +117,7 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
     /**
      * Maximum allowed message size in bytes.
      */
+    //ls:单个消息体最大限制4M
     private int maxMessageSize = 1024 * 1024 * 4; // 4M
 
     /**
@@ -364,6 +365,7 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
      * @throws InterruptedException if the sending thread is interrupted.
      */
     @Override
+    //ls:消息发送
     public void send(Message msg,
         SendCallback sendCallback) throws MQClientException, RemotingException, InterruptedException {
         msg.setTopic(withNamespace(msg.getTopic()));
