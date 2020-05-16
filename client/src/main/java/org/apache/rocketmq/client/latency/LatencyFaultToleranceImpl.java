@@ -52,6 +52,7 @@ public class LatencyFaultToleranceImpl implements LatencyFaultTolerance<String> 
     public boolean isAvailable(final String name) {
         final FaultItem faultItem = this.faultItemTable.get(name);
         if (faultItem != null) {
+            //ls:是否过了规避
             return faultItem.isAvailable();
         }
         return true;
@@ -99,6 +100,7 @@ public class LatencyFaultToleranceImpl implements LatencyFaultTolerance<String> 
     class FaultItem implements Comparable<FaultItem> {
         private final String name;
         private volatile long currentLatency;
+        //ls:故障规避时间戳
         private volatile long startTimestamp;
 
         public FaultItem(final String name) {
@@ -130,6 +132,7 @@ public class LatencyFaultToleranceImpl implements LatencyFaultTolerance<String> 
             return 0;
         }
 
+        //ls:判断是否可用的标准是是否过了规避的时间段
         public boolean isAvailable() {
             return (System.currentTimeMillis() - startTimestamp) >= 0;
         }

@@ -25,9 +25,13 @@ import org.apache.rocketmq.common.message.MessageQueue;
 public class MQFaultStrategy {
     private final static InternalLogger log = ClientLogger.getLog();
     private final LatencyFaultTolerance<String> latencyFaultTolerance = new LatencyFaultToleranceImpl();
-
+    //ls:故障延迟机制 默认false
     private boolean sendLatencyFaultEnable = false;
-
+    /**
+     * latencyMax，根据 currentLatency 本次消息 发送延迟，从 latencyMax 尾部向前找到
+     * 第一个比 currentLatency 小的索引 index，如果没有找到，返回 0。 然后 根据这个 索 引从 notAvailableDuration数组中取出对应的时间 ，在这个时长内， Broker将设置为不可用。
+     */
+    //ls:100ms以内算正常
     private long[] latencyMax = {50L, 100L, 550L, 1000L, 2000L, 3000L, 15000L};
     private long[] notAvailableDuration = {0L, 0L, 30000L, 60000L, 120000L, 180000L, 600000L};
 
@@ -55,6 +59,7 @@ public class MQFaultStrategy {
         this.sendLatencyFaultEnable = sendLatencyFaultEnable;
     }
 
+    //ls:根据策略选择一个可以发送的queue  lastBrokerName
     public MessageQueue selectOneMessageQueue(final TopicPublishInfo tpInfo, final String lastBrokerName) {
         if (this.sendLatencyFaultEnable) {
             try {
@@ -64,7 +69,9 @@ public class MQFaultStrategy {
                     if (pos < 0)
                         pos = 0;
                     MessageQueue mq = tpInfo.getMessageQueueList().get(pos);
+                    //ls:验证该队列是否可用
                     if (latencyFaultTolerance.isAvailable(mq.getBrokerName())) {
+                        //ls:说明正常可用
                         if (null == lastBrokerName || mq.getBrokerName().equals(lastBrokerName))
                             return mq;
                     }
@@ -80,6 +87,7 @@ public class MQFaultStrategy {
                     }
                     return mq;
                 } else {
+                    //ls:意味着可以故障恢复了
                     latencyFaultTolerance.remove(notBestBroker);
                 }
             } catch (Exception e) {
@@ -94,6 +102,8 @@ public class MQFaultStrategy {
 
     public void updateFaultItem(final String brokerName, final long currentLatency, boolean isolation) {
         if (this.sendLatencyFaultEnable) {
+            //ls:computeNotAvailableDuration 计算需要规避的时长
+            //ls:isolation 默认是30s
             long duration = computeNotAvailableDuration(isolation ? 30000 : currentLatency);
             this.latencyFaultTolerance.updateFaultItem(brokerName, currentLatency, duration);
         }
