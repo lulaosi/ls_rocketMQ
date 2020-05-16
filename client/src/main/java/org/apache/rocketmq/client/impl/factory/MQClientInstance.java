@@ -937,7 +937,7 @@ public class MQClientInstance {
         if (null == group || null == producer) {
             return false;
         }
-
+        //ls:producerTable管理这些producer
         MQProducerInner prev = this.producerTable.putIfAbsent(group, producer);
         if (prev != null) {
             log.warn("the producer group[{}] exist already.", group);
