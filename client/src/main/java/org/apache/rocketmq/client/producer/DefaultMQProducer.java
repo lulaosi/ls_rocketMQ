@@ -900,8 +900,10 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
     }
 
     @Override
+    //ls:批量发送消息
     public SendResult send(
         Collection<Message> msgs) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
+        //ls:batch打包
         return this.defaultMQProducerImpl.send(batch(msgs));
     }
 

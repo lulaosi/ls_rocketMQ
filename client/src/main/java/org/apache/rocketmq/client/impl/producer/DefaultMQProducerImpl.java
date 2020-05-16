@@ -888,6 +888,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                 }
 
                 return sendResult;
+                //ls:根据异常类型  executeSendMessageHookAfter 钩子后增强
             } catch (RemotingException e) {
                 if (this.hasSendMessageHook()) {
                     context.setException(e);
@@ -1300,6 +1301,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
     /**
      * DEFAULT SYNC -------------------------------------------------------
      */
+    //ls:
     public SendResult send(
         Message msg) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
         return send(msg, this.defaultMQProducer.getSendMsgTimeout());

@@ -478,6 +478,7 @@ public class MessageDecoder {
         return byteBuffer.array();
     }
 
+    //ls:对消息进行编码合成
     public static Message decodeMessage(ByteBuffer byteBuffer) throws Exception {
         Message message = new Message();
 
