@@ -462,9 +462,10 @@ public abstract class NettyRemotingAbstract {
                 once.release();
                 throw new RemotingTimeoutException("invokeAsyncImpl call timeout");
             }
-
+            //ls:异步执行
             final ResponseFuture responseFuture = new ResponseFuture(channel, opaque, timeoutMillis - costTime, invokeCallback, once);
             this.responseTable.put(opaque, responseFuture);
+            //ls:Netty NIO写消息出去
             try {
                 channel.writeAndFlush(request).addListener(new ChannelFutureListener() {
                     @Override

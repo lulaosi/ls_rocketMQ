@@ -19,6 +19,7 @@ package org.apache.rocketmq.client.hook;
 public interface SendMessageHook {
     String hookName();
 
+    //ls:钩子函数 增强
     void sendMessageBefore(final SendMessageContext context);
 
     void sendMessageAfter(final SendMessageContext context);
