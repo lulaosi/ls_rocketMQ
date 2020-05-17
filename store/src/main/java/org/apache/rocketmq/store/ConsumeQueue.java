@@ -61,7 +61,7 @@ public class ConsumeQueue {
         String queueDir = this.storePath
             + File.separator + topic
             + File.separator + queueId;
-
+        //ls:consumeQueue中包含的重要内容就是MappedFileQueue
         this.mappedFileQueue = new MappedFileQueue(queueDir, mappedFileSize, null);
 
         this.byteBufferIndex = ByteBuffer.allocate(CQ_STORE_UNIT_SIZE);

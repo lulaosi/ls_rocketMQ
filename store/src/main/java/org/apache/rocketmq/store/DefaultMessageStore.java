@@ -174,6 +174,7 @@ public class DefaultMessageStore implements MessageStore {
     /**
      * @throws IOException
      */
+    //ls:重启恢复加载日志和索引文件
     public boolean load() {
         boolean result = true;
 
@@ -186,17 +187,20 @@ public class DefaultMessageStore implements MessageStore {
             }
 
             // load Commit Log
+            //ls:加载commitlog
             result = result && this.commitLog.load();
 
             // load Consume Queue
+            //ls:加载consumeQueue
             result = result && this.loadConsumeQueue();
 
             if (result) {
+                //ls:恢复之后加载存储检查点
                 this.storeCheckpoint =
                     new StoreCheckpoint(StorePathConfigHelper.getStoreCheckpoint(this.messageStoreConfig.getStorePathRootDir()));
-
+                //ls:加载indexFile
                 this.indexService.load(lastExitOK);
-
+                //ls:根据lastExitOK文件恢复策略
                 this.recover(lastExitOK);
 
                 log.info("load over, and the max phy offset = {}", this.getMaxPhyOffset());
@@ -1354,11 +1358,12 @@ public class DefaultMessageStore implements MessageStore {
         return file.exists();
     }
 
+    //ls:恢复加载consumeQueue
     private boolean loadConsumeQueue() {
         File dirLogic = new File(StorePathConfigHelper.getStorePathConsumeQueue(this.messageStoreConfig.getStorePathRootDir()));
         File[] fileTopicList = dirLogic.listFiles();
         if (fileTopicList != null) {
-
+            //ls:按照topic
             for (File fileTopic : fileTopicList) {
                 String topic = fileTopic.getName();
 
@@ -1371,6 +1376,7 @@ public class DefaultMessageStore implements MessageStore {
                         } catch (NumberFormatException e) {
                             continue;
                         }
+                        //ls:构建
                         ConsumeQueue logic = new ConsumeQueue(
                             topic,
                             queueId,
@@ -1391,6 +1397,7 @@ public class DefaultMessageStore implements MessageStore {
         return true;
     }
 
+    //ls:恢复策略
     private void recover(final boolean lastExitOK) {
         long maxPhyOffsetOfConsumeQueue = this.recoverConsumeQueue();
 
@@ -1399,7 +1406,7 @@ public class DefaultMessageStore implements MessageStore {
         } else {
             this.commitLog.recoverAbnormally(maxPhyOffsetOfConsumeQueue);
         }
-
+        //ls:文件恢复
         this.recoverTopicQueueTable();
     }
 

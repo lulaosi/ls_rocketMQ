@@ -160,8 +160,10 @@ public class MappedFileQueue {
                 }
 
                 try {
+                    //ls:加载commitlog到内存
+                    //ls:MappedFile init方法
                     MappedFile mappedFile = new MappedFile(file.getPath(), mappedFileSize);
-
+                    //ls:置位
                     mappedFile.setWrotePosition(this.mappedFileSize);
                     mappedFile.setFlushedPosition(this.mappedFileSize);
                     mappedFile.setCommittedPosition(this.mappedFileSize);
