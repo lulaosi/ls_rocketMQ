@@ -1488,7 +1488,9 @@ public class DefaultMessageStore implements MessageStore {
         }
     }
 
+    //ls:消息转发
     public void putMessagePositionInfo(DispatchRequest dispatchRequest) {
+        //ls:首先根据topic获取到ConsumeQueue
         ConsumeQueue cq = this.findConsumeQueue(dispatchRequest.getTopic(), dispatchRequest.getQueueId());
         cq.putMessagePositionInfoWrapper(dispatchRequest);
     }
@@ -1545,11 +1547,13 @@ public class DefaultMessageStore implements MessageStore {
     class CommitLogDispatcherBuildConsumeQueue implements CommitLogDispatcher {
 
         @Override
+        //ls:消息队列转发 更新consumeQueue
         public void dispatch(DispatchRequest request) {
             final int tranType = MessageSysFlag.getTransactionValue(request.getSysFlag());
             switch (tranType) {
                 case MessageSysFlag.TRANSACTION_NOT_TYPE:
                 case MessageSysFlag.TRANSACTION_COMMIT_TYPE:
+                    //ls:putMessagePositionInfo
                     DefaultMessageStore.this.putMessagePositionInfo(request);
                     break;
                 case MessageSysFlag.TRANSACTION_PREPARED_TYPE:
@@ -1562,6 +1566,7 @@ public class DefaultMessageStore implements MessageStore {
     class CommitLogDispatcherBuildIndex implements CommitLogDispatcher {
 
         @Override
+        //ls:消息转发 更新indexFile
         public void dispatch(DispatchRequest request) {
             if (DefaultMessageStore.this.messageStoreConfig.isMessageIndexEnable()) {
                 DefaultMessageStore.this.indexService.buildIndex(request);

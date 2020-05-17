@@ -198,6 +198,7 @@ public class IndexService {
         return topic + "#" + key;
     }
 
+    //ls:index索引构建
     public void buildIndex(DispatchRequest req) {
         IndexFile indexFile = retryGetAndCreateIndexFile();
         if (indexFile != null) {
@@ -220,6 +221,7 @@ public class IndexService {
             }
 
             if (req.getUniqKey() != null) {
+                //ls:构建index
                 indexFile = putKey(indexFile, msg, buildKey(topic, req.getUniqKey()));
                 if (indexFile == null) {
                     log.error("putKey error commitlog {} uniqkey {}", req.getCommitLogOffset(), req.getUniqKey());
@@ -253,7 +255,7 @@ public class IndexService {
             if (null == indexFile) {
                 return null;
             }
-
+            //ls:将消息偏移量还有存储时间戳信息放到索引文件
             ok = indexFile.putKey(idxKey, msg.getCommitLogOffset(), msg.getStoreTimestamp());
         }
 
