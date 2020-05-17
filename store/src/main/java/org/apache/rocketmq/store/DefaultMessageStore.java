@@ -288,6 +288,7 @@ public class DefaultMessageStore implements MessageStore {
         this.storeStatsService.start();
 
         this.createTempFile();
+        //ls:定时清除文件线程
         this.addScheduleTask();
         this.shutdown = false;
     }
@@ -1292,6 +1293,7 @@ public class DefaultMessageStore implements MessageStore {
 
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
             @Override
+            //ls:RocketMQ会每隔10s调度一次 cleanFilesPeriodically
             public void run() {
                 DefaultMessageStore.this.cleanFilesPeriodically();
             }
@@ -1334,6 +1336,7 @@ public class DefaultMessageStore implements MessageStore {
     }
 
     private void cleanFilesPeriodically() {
+        //ls:清除commitlog consumeQueue
         this.cleanCommitLogService.run();
         this.cleanConsumeQueueService.run();
     }
@@ -1600,8 +1603,10 @@ public class DefaultMessageStore implements MessageStore {
             DefaultMessageStore.log.info("executeDeleteFilesManually was invoked");
         }
 
+        //ls:定时清除
         public void run() {
             try {
+                //ls:清除
                 this.deleteExpiredFiles();
 
                 this.redeleteHangedFile();
@@ -1635,7 +1640,7 @@ public class DefaultMessageStore implements MessageStore {
                     cleanAtOnce);
 
                 fileReservedTime *= 60 * 60 * 1000;
-
+                //ls:删除逻辑
                 deleteCount = DefaultMessageStore.this.commitLog.deleteExpiredFile(fileReservedTime, deletePhysicFilesInterval,
                     destroyMapedFileIntervalForcibly, cleanAtOnce);
                 if (deleteCount > 0) {
