@@ -211,6 +211,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
     }
     //ls:pullMessage消息拉取
     public void pullMessage(final PullRequest pullRequest) {
+        //ls:获取processQueue
         final ProcessQueue processQueue = pullRequest.getProcessQueue();
         if (processQueue.isDropped()) {
             log.info("the pull request[{}] is dropped.", pullRequest.toString());
@@ -245,7 +246,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
             }
             return;
         }
-
+        //ls:从时间和数量进行控制,避免阻塞导致的重复消费
         if (cachedMessageSizeInMiB > this.defaultMQPushConsumer.getPullThresholdSizeForQueue()) {
             this.executePullRequestLater(pullRequest, PULL_TIME_DELAY_MILLS_WHEN_FLOW_CONTROL);
             if ((queueFlowControlTimes++ % 1000) == 0) {
@@ -300,8 +301,10 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
 
         PullCallback pullCallback = new PullCallback() {
             @Override
+            //ls:该方法会在clientApi中调用  需要往上找reponse
             public void onSuccess(PullResult pullResult) {
                 if (pullResult != null) {
+                    //ls:指定参数进行消息解码组装
                     pullResult = DefaultMQPushConsumerImpl.this.pullAPIWrapper.processPullResult(pullRequest.getMessageQueue(), pullResult,
                             subscriptionData);
 

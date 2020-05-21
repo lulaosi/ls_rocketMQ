@@ -729,9 +729,11 @@ public class MQClientAPIImpl {
                 assert false;
                 return null;
             case ASYNC:
+                //ls:异步拉取
                 this.pullMessageAsync(addr, request, timeoutMillis, pullCallback);
                 return null;
             case SYNC:
+                //ls:同步
                 return this.pullMessageSync(addr, request, timeoutMillis);
             default:
                 assert false;
@@ -753,8 +755,10 @@ public class MQClientAPIImpl {
                 RemotingCommand response = responseFuture.getResponseCommand();
                 if (response != null) {
                     try {
+                        //ls:此处
                         PullResult pullResult = MQClientAPIImpl.this.processPullResponse(response);
                         assert pullResult != null;
+                        //ls:将pullResult进行组装
                         pullCallback.onSuccess(pullResult);
                     } catch (Exception e) {
                         pullCallback.onException(e);
@@ -773,16 +777,20 @@ public class MQClientAPIImpl {
         });
     }
 
+    //ls:消息拉取
     private PullResult pullMessageSync(
         final String addr,
         final RemotingCommand request,
         final long timeoutMillis
     ) throws RemotingException, InterruptedException, MQBrokerException {
+        //ls:走Netty网络请求获取response
         RemotingCommand response = this.remotingClient.invokeSync(addr, request, timeoutMillis);
         assert response != null;
+        //ls:解析response为pullresult
         return this.processPullResponse(response);
     }
 
+    //ls:处理pull请求
     private PullResult processPullResponse(
         final RemotingCommand response) throws MQBrokerException, RemotingCommandException {
         PullStatus pullStatus = PullStatus.NO_NEW_MSG;
@@ -806,7 +814,7 @@ public class MQClientAPIImpl {
 
         PullMessageResponseHeader responseHeader =
             (PullMessageResponseHeader) response.decodeCommandCustomHeader(PullMessageResponseHeader.class);
-
+        //ls:组装解析为pullResult
         return new PullResultExt(pullStatus, responseHeader.getNextBeginOffset(), responseHeader.getMinOffset(),
             responseHeader.getMaxOffset(), null, responseHeader.getSuggestWhichBrokerId(), response.getBody());
     }
