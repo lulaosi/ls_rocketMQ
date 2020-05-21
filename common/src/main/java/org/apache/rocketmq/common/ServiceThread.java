@@ -50,6 +50,7 @@ public abstract class ServiceThread implements Runnable {
         stopped = false;
         this.thread = new Thread(this, getServiceName());
         this.thread.setDaemon(isDaemon);
+        //ls:找run方法 PullMessageService
         this.thread.start();
     }
 
