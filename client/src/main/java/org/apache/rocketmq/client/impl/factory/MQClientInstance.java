@@ -224,7 +224,7 @@ public class MQClientInstance {
     }
 
     public void start() throws MQClientException {
-
+        //ls:JVM启动一次
         synchronized (this) {
             switch (this.serviceState) {
                 case CREATE_JUST:

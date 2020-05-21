@@ -689,8 +689,10 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
      * @throws MQClientException if there is any client error.
      */
     @Override
+    //ls:start入口
     public void start() throws MQClientException {
         setConsumerGroup(NamespaceUtil.wrapNamespace(this.getNamespace(), this.consumerGroup));
+        //ls:入口
         this.defaultMQPushConsumerImpl.start();
         if (null != traceDispatcher) {
             try {
