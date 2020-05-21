@@ -16,6 +16,7 @@
  */
 package org.apache.rocketmq.common.consumer;
 
+//ls:消息起点策略
 public enum ConsumeFromWhere {
     CONSUME_FROM_LAST_OFFSET,
 
