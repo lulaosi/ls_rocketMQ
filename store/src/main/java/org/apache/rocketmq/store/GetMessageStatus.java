@@ -17,6 +17,7 @@
 package org.apache.rocketmq.store;
 
 public enum GetMessageStatus {
+    //ls:拉取结果枚举
 
     FOUND,
 

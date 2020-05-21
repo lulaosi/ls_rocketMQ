@@ -492,7 +492,7 @@ public class ConsumeQueue {
         }
     }
 
-    //ls:查询指定消息
+    //ls:查询指定消息 拉取消息会走这里
     public SelectMappedBufferResult getIndexBuffer(final long startIndex) {
         int mappedFileSize = this.mappedFileSize;
         long offset = startIndex * CQ_STORE_UNIT_SIZE;
