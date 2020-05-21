@@ -43,7 +43,7 @@ public class PullMessageService extends ServiceThread {
     public PullMessageService(MQClientInstance mQClientFactory) {
         this.mQClientFactory = mQClientFactory;
     }
-
+    //ls:executePullRequestLater消息拉取
     public void executePullRequestLater(final PullRequest pullRequest, final long timeDelay) {
         if (!isStopped()) {
             this.scheduledExecutorService.schedule(new Runnable() {
@@ -56,7 +56,7 @@ public class PullMessageService extends ServiceThread {
             log.warn("PullMessageServiceScheduledThread has shutdown");
         }
     }
-
+    //ls:executePullRequestImmediately 立即拉取
     public void executePullRequestImmediately(final PullRequest pullRequest) {
         try {
             this.pullRequestQueue.put(pullRequest);
@@ -77,10 +77,12 @@ public class PullMessageService extends ServiceThread {
         return scheduledExecutorService;
     }
 
+    //ls:pullMessage
     private void pullMessage(final PullRequest pullRequest) {
         final MQConsumerInner consumer = this.mQClientFactory.selectConsumer(pullRequest.getConsumerGroup());
         if (consumer != null) {
             DefaultMQPushConsumerImpl impl = (DefaultMQPushConsumerImpl) consumer;
+            //ls:pullMessage
             impl.pullMessage(pullRequest);
         } else {
             log.warn("No matched consumer for the PullRequest {}, drop it", pullRequest);
@@ -95,6 +97,7 @@ public class PullMessageService extends ServiceThread {
             try {
                 //ls:就是从一个队列中take数据 TAKE 阻塞式获取PullRequest
                 PullRequest pullRequest = this.pullRequestQueue.take();
+                //ls:pull
                 this.pullMessage(pullRequest);
             } catch (InterruptedException ignored) {
             } catch (Exception e) {
