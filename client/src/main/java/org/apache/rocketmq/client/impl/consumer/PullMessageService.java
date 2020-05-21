@@ -81,6 +81,7 @@ public class PullMessageService extends ServiceThread {
     private void pullMessage(final PullRequest pullRequest) {
         final MQConsumerInner consumer = this.mQClientFactory.selectConsumer(pullRequest.getConsumerGroup());
         if (consumer != null) {
+            //ls:该处进行了强转为DefaultMQPushConsumerImpl,也就是说pull模式只是走的还是push的逻辑
             DefaultMQPushConsumerImpl impl = (DefaultMQPushConsumerImpl) consumer;
             //ls:pullMessage
             impl.pullMessage(pullRequest);
