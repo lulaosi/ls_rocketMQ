@@ -86,6 +86,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
                                                                   RemotingCommand request) throws RemotingCommandException {
         final SendMessageContext mqtraceContext;
         switch (request.getCode()) {
+            //ls:consumer发送过来的ack
             case RequestCode.CONSUMER_SEND_MSG_BACK:
                 return this.asyncConsumerSendMsgBack(ctx, request);
             default:
@@ -218,6 +219,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
 
         String originMsgId = MessageAccessor.getOriginMessageId(msgExt);
         MessageAccessor.setOriginMessageId(msgInner, UtilAll.isBlank(originMsgId) ? msgExt.getMsgId() : originMsgId);
+        //ls:ack的成功逻辑
         CompletableFuture<PutMessageResult> putMessageResult = this.brokerController.getMessageStore().asyncPutMessage(msgInner);
         return putMessageResult.thenApply((r) -> {
             if (r != null) {
@@ -228,7 +230,9 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
                         if (correctTopic != null) {
                             backTopic = correctTopic;
                         }
+                        //ls:更新重试次数
                         this.brokerController.getBrokerStatsManager().incSendBackNums(requestHeader.getGroup(), backTopic);
+                        //ls:ack
                         response.setCode(ResponseCode.SUCCESS);
                         response.setRemark(null);
                         return response;
