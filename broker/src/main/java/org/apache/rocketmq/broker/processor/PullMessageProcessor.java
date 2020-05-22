@@ -409,7 +409,7 @@ public class PullMessageProcessor extends AsyncNettyRequestProcessor implements 
                     }
                     break;
                 case ResponseCode.PULL_NOT_FOUND:
-
+                    //ls:是否支持挂起
                     if (brokerAllowSuspend && hasSuspendFlag) {
                         long pollingTimeMills = suspendTimeoutMillisLong;
                         if (!this.brokerController.getBrokerConfig().isLongPollingEnable()) {
@@ -421,6 +421,7 @@ public class PullMessageProcessor extends AsyncNettyRequestProcessor implements 
                         int queueId = requestHeader.getQueueId();
                         PullRequest pullRequest = new PullRequest(request, channel, pollingTimeMills,
                             this.brokerController.getMessageStore().now(), offset, subscriptionData, messageFilter);
+                        //ls:长轮询机制getPullRequestHoldService
                         this.brokerController.getPullRequestHoldService().suspendPullRequest(topic, queueId, pullRequest);
                         response = null;
                         break;
@@ -555,6 +556,7 @@ public class PullMessageProcessor extends AsyncNettyRequestProcessor implements 
             @Override
             public void run() {
                 try {
+                    //ls:处理pullRequest
                     final RemotingCommand response = PullMessageProcessor.this.processRequest(channel, request, false);
 
                     if (response != null) {

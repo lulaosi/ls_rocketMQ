@@ -68,6 +68,7 @@ public class PullRequestHoldService extends ServiceThread {
         log.info("{} service started", this.getServiceName());
         while (!this.isStopped()) {
             try {
+                //ls:开启长轮询 每隔5s
                 if (this.brokerController.getBrokerConfig().isLongPollingEnable()) {
                     this.waitForRunning(5 * 1000);
                 } else {
@@ -75,6 +76,7 @@ public class PullRequestHoldService extends ServiceThread {
                 }
 
                 long beginLockTimestamp = this.systemClock.now();
+                //ls:判断是否有消息
                 this.checkHoldRequest();
                 long costTime = this.systemClock.now() - beginLockTimestamp;
                 if (costTime > 5 * 1000) {
@@ -127,7 +129,7 @@ public class PullRequestHoldService extends ServiceThread {
                     if (newestOffset <= request.getPullFromThisOffset()) {
                         newestOffset = this.brokerController.getMessageStore().getMaxOffsetInQueue(topic, queueId);
                     }
-
+                    //ls:如果新的最大偏移量大于待拉取偏移量,说明消息队列中有新的消息进到内存了
                     if (newestOffset > request.getPullFromThisOffset()) {
                         boolean match = request.getMessageFilter().isMatchedByConsumeQueue(tagsCode,
                             new ConsumeQueueExt.CqExtUnit(tagsCode, msgStoreTime, filterBitMap));
@@ -138,6 +140,7 @@ public class PullRequestHoldService extends ServiceThread {
 
                         if (match) {
                             try {
+                                //ls:说明有数据进来并且符合订阅,那么就去执行
                                 this.brokerController.getPullMessageProcessor().executeRequestWhenWakeup(request.getClientChannel(),
                                     request.getRequestCommand());
                             } catch (Throwable e) {
