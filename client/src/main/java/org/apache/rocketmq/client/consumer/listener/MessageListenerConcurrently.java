@@ -30,6 +30,7 @@ public interface MessageListenerConcurrently extends MessageListener {
      * @param msgs msgs.size() >= 1<br> DefaultMQPushConsumer.consumeMessageBatchMaxSize=1,you can modify here
      * @return The consume status
      */
+    //ls:消费端需要实现该接口的该方法 这就是业务代码
     ConsumeConcurrentlyStatus consumeMessage(final List<MessageExt> msgs,
         final ConsumeConcurrentlyContext context);
 }
