@@ -40,6 +40,7 @@ import org.apache.rocketmq.remoting.common.RemotingUtil;
 import org.apache.rocketmq.store.CommitLog;
 import org.apache.rocketmq.store.DefaultMessageStore;
 
+//ls:高可用
 public class HAService {
     private static final InternalLogger log = InternalLoggerFactory.getLogger(LoggerName.STORE_LOGGER_NAME);
 
@@ -156,6 +157,7 @@ public class HAService {
     /**
      * Listens to slave connections to create {@link HAConnection}.
      */
+    //ls:主从连接 负责监听mater与salve
     class AcceptSocketService extends ServiceThread {
         private final SocketAddress socketAddressListen;
         private ServerSocketChannel serverSocketChannel;
@@ -250,6 +252,7 @@ public class HAService {
     /**
      * GroupTransferService Service
      */
+    //ls:主从数据同步服务
     class GroupTransferService extends ServiceThread {
 
         private final WaitNotifyObject notifyTransferObject = new WaitNotifyObject();

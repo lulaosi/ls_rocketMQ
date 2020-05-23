@@ -192,6 +192,7 @@ public class TransactionalMessageBridge {
         return foundList;
     }
 
+    //ls:存储prepare消息,但是没有放到原有队列
     public PutMessageResult putHalfMessage(MessageExtBrokerInner messageInner) {
         return store.putMessage(parseHalfMessageInner(messageInner));
     }

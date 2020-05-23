@@ -22,14 +22,15 @@ import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.protocol.NamespaceUtil;
 import org.apache.rocketmq.remoting.RPCHook;
 
+//ls:事务消息发送端实现
 public class TransactionMQProducer extends DefaultMQProducer {
     private TransactionCheckListener transactionCheckListener;
     private int checkThreadPoolMinSize = 1;
     private int checkThreadPoolMaxSize = 1;
     private int checkRequestHoldMax = 2000;
-
+    //ls:事务状态回查
     private ExecutorService executorService;
-
+    //ls:事务消息监听器 监听producer端的prepared状态
     private TransactionListener transactionListener;
 
     public TransactionMQProducer() {
@@ -80,6 +81,7 @@ public class TransactionMQProducer extends DefaultMQProducer {
     }
 
     @Override
+    //ls:事务消息发送流程
     public TransactionSendResult sendMessageInTransaction(final Message msg,
         final Object arg) throws MQClientException {
         if (null == this.transactionListener) {
@@ -87,6 +89,7 @@ public class TransactionMQProducer extends DefaultMQProducer {
         }
 
         msg.setTopic(NamespaceUtil.wrapNamespace(this.getNamespace(), msg.getTopic()));
+        //ls:sendMessageInTransaction
         return this.defaultMQProducerImpl.sendMessageInTransaction(msg, null, arg);
     }
 

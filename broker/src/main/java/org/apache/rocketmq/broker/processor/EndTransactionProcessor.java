@@ -51,6 +51,7 @@ public class EndTransactionProcessor extends AsyncNettyRequestProcessor implemen
     }
 
     @Override
+    //ls:事务消息提交或者回滚 存储到commitlog 删掉prepare消息
     public RemotingCommand processRequest(ChannelHandlerContext ctx, RemotingCommand request) throws
         RemotingCommandException {
         final RemotingCommand response = RemotingCommand.createResponseCommand(null);

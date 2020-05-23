@@ -1216,6 +1216,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
         }
     }
 
+    //ls:事务消息发送 PROPERTY_TRANSACTION_PREPARED
     public TransactionSendResult sendMessageInTransaction(final Message msg,
         final LocalTransactionExecuter localTransactionExecuter, final Object arg)
         throws MQClientException {
@@ -1235,6 +1236,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
         MessageAccessor.putProperty(msg, MessageConst.PROPERTY_TRANSACTION_PREPARED, "true");
         MessageAccessor.putProperty(msg, MessageConst.PROPERTY_PRODUCER_GROUP, this.defaultMQProducer.getProducerGroup());
         try {
+            //ls:send
             sendResult = this.send(msg);
         } catch (Exception e) {
             throw new MQClientException("send message Exception", e);
@@ -1244,6 +1246,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
         Throwable localException = null;
         switch (sendResult.getSendStatus()) {
             case SEND_OK: {
+                //ls:发送成功 记录消息唯一ID到本地
                 try {
                     if (sendResult.getTransactionId() != null) {
                         msg.putUserProperty("__transactionId__", sendResult.getTransactionId());
@@ -1276,6 +1279,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
             case FLUSH_DISK_TIMEOUT:
             case FLUSH_SLAVE_TIMEOUT:
             case SLAVE_NOT_AVAILABLE:
+                //ls:如果失败 设置此次操作回滚
                 localTransactionState = LocalTransactionState.ROLLBACK_MESSAGE;
                 break;
             default:
@@ -1301,12 +1305,13 @@ public class DefaultMQProducerImpl implements MQProducerInner {
     /**
      * DEFAULT SYNC -------------------------------------------------------
      */
-    //ls:
+    //ls:发送
     public SendResult send(
         Message msg) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
         return send(msg, this.defaultMQProducer.getSendMsgTimeout());
     }
 
+    //ls:事务结束 提交或者回滚
     public void endTransaction(
         final SendResult sendResult,
         final LocalTransactionState localTransactionState,
