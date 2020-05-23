@@ -124,6 +124,7 @@ public class TransactionalMessageServiceImpl implements TransactionalMessageServ
     }
 
     @Override
+    //ls:回查事务状态
     public void check(long transactionTimeout, int transactionCheckMax,
         AbstractTransactionalMessageCheckListener listener) {
         try {
@@ -158,6 +159,7 @@ public class TransactionalMessageServiceImpl implements TransactionalMessageServ
                 int getMessageNullCount = 1;
                 long newOffset = halfOffset;
                 long i = halfOffset;
+                //ls:
                 while (true) {
                     if (System.currentTimeMillis() - startTime > MAX_PROCESS_TIME_LIMIT) {
                         log.info("Queue={} process time reach max={}", messageQueue, MAX_PROCESS_TIME_LIMIT);
@@ -229,6 +231,7 @@ public class TransactionalMessageServiceImpl implements TransactionalMessageServ
                             }
                             listener.resolveHalfMsg(msgExt);
                         } else {
+                            //ls:避免重复回查
                             pullResult = fillOpRemoveMap(removeMap, opQueue, pullResult.getNextBeginOffset(), halfOffset, doneOpOffset);
                             log.debug("The miss offset:{} in messageQueue:{} need to get more opMsg, result is:{}", i,
                                 messageQueue, pullResult);
@@ -238,6 +241,7 @@ public class TransactionalMessageServiceImpl implements TransactionalMessageServ
                     newOffset = i + 1;
                     i++;
                 }
+                //ls:更新Borker的offset
                 if (newOffset != halfOffset) {
                     transactionalMessageBridge.updateConsumeOffset(messageQueue, newOffset);
                 }
