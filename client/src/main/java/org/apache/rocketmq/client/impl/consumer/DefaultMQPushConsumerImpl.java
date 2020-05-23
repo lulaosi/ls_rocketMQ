@@ -915,13 +915,14 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
         }
     }
 
+    //ls:消息订阅过滤
     public void subscribe(final String topic, final MessageSelector messageSelector) throws MQClientException {
         try {
             if (messageSelector == null) {
                 subscribe(topic, SubscriptionData.SUB_ALL);
                 return;
             }
-
+            //ls:获取subscriptionData
             SubscriptionData subscriptionData = FilterAPI.build(topic,
                     messageSelector.getExpression(), messageSelector.getExpressionType());
 
