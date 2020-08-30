@@ -407,7 +407,7 @@ public class DefaultMessageStore implements MessageStore {
         } else {
             this.printTimes.set(0);
         }
-
+        //ls:isOSPageCacheBusy
         if (this.isOSPageCacheBusy()) {
             return PutMessageStatus.OS_PAGECACHE_BUSY;
         }
@@ -478,7 +478,9 @@ public class DefaultMessageStore implements MessageStore {
     @Override
 
     //ls:消息存储入口
+    //ls:入口
     public PutMessageResult putMessage(MessageExtBrokerInner msg) {
+        //ls:checkStoreStatus
         PutMessageStatus checkStoreStatus = this.checkStoreStatus();
         if (checkStoreStatus != PutMessageStatus.PUT_OK) {
             return new PutMessageResult(checkStoreStatus, null);

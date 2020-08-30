@@ -777,6 +777,7 @@ public class CommitLog {
 
     }
 
+
     //ls:消息存储
     public PutMessageResult putMessage(final MessageExtBrokerInner msg) {
         // Set the storage time
@@ -825,7 +826,7 @@ public class CommitLog {
         }
 
         long elapsedTimeInLock = 0;
-        //ls:获取文件夹下的最新文件file
+        //ls:获取文件夹下的最新文件file MappedFile是commitlog的映射
         MappedFile unlockMappedFile = null;
         MappedFile mappedFile = this.mappedFileQueue.getLastMappedFile();
         //ls:自己用CAS实现了自旋锁 在低竞争情况下能够减少上下文切换,ReentrantLock虽然也是CAS,但是会有挂起
@@ -848,11 +849,12 @@ public class CommitLog {
                 beginTimeInLock = 0;
                 return new PutMessageResult(PutMessageStatus.CREATE_MAPEDFILE_FAILED, null);
             }
-            //ls:具体执行者是mappedFile
+            //ls:具体执行者是mappedFile appendMessage
             result = mappedFile.appendMessage(msg, this.appendMessageCallback);
             switch (result.getStatus()) {
                 case PUT_OK:
                     break;
+                    //ls:写满了之后新建一个mappedFile
                 case END_OF_FILE:
                     unlockMappedFile = mappedFile;
                     // Create a new file, re-write the message
@@ -880,6 +882,7 @@ public class CommitLog {
             elapsedTimeInLock = this.defaultMessageStore.getSystemClock().now() - beginLockTimestamp;
             beginTimeInLock = 0;
         } finally {
+            //ls:unlock
             putMessageLock.unlock();
         }
 
@@ -896,8 +899,9 @@ public class CommitLog {
         // Statistics
         storeStatsService.getSinglePutMessageTopicTimesTotal(msg.getTopic()).incrementAndGet();
         storeStatsService.getSinglePutMessageTopicSizeTotal(topic).addAndGet(result.getWroteBytes());
-        //ls:追加到buffer,映射,这是这是刷盘操作
+        //ls:追加到buffer,映射,这是这是刷盘操作 刷盘
         handleDiskFlush(result, putMessageResult, msg);
+        //ls:主从同步
         handleHA(result, putMessageResult, msg);
 
         return putMessageResult;
@@ -1535,6 +1539,7 @@ public class CommitLog {
             // STORETIMESTAMP + STOREHOSTADDRESS + OFFSET <br>
 
             // PHY OFFSET
+            //ls:绝对offset
             long wroteOffset = fileFromOffset + byteBuffer.position();
 
             int sysflag = msgInner.getSysFlag();
@@ -1559,7 +1564,7 @@ public class CommitLog {
             keyBuilder.append('-');
             keyBuilder.append(msgInner.getQueueId());
             String key = keyBuilder.toString();
-            //ls:获取偏移量
+            //ls:获取偏移量 相对位置
             Long queueOffset = CommitLog.this.topicQueueTable.get(key);
             if (null == queueOffset) {
                 queueOffset = 0L;
@@ -1584,6 +1589,7 @@ public class CommitLog {
             /**
              * Serialize message
              */
+            //ls:序列化
             final byte[] propertiesData =
                 msgInner.getPropertiesString() == null ? null : msgInner.getPropertiesString().getBytes(MessageDecoder.CHARSET_UTF8);
 
@@ -1598,7 +1604,7 @@ public class CommitLog {
             final int topicLength = topicData.length;
 
             final int bodyLength = msgInner.getBody() == null ? 0 : msgInner.getBody().length;
-            //ls:根据消息计算需要的存储长度
+            //ls:根据消息计算需要的存储长度 4M
             final int msgLen = calMsgLength(msgInner.getSysFlag(), bodyLength, topicLength, propertiesLength);
 
             // Exceeds the maximum message
@@ -1609,6 +1615,7 @@ public class CommitLog {
             }
 
             // Determines whether there is sufficient free space
+            //ls:commitlog是否需要创建一个新的
             if ((msgLen + END_FILE_MIN_BLANK_LENGTH) > maxBlank) {
                 this.resetByteBuffer(this.msgStoreItemMemory, maxBlank);
                 // 1 TOTALSIZE
@@ -1671,7 +1678,7 @@ public class CommitLog {
             final long beginTimeMills = CommitLog.this.defaultMessageStore.now();
             // Write messages to the queue buffer
             byteBuffer.put(this.msgStoreItemMemory.array(), 0, msgLen);
-            //ls:这里只是将消息存储在 MappedFile对应的内存映射Buffer中,并没有刷写到磁盘
+            //ls:这里只是将消息存储在 MappedFile对应的内存映射Buffer中,并没有刷写到磁盘 mappedfile
             AppendMessageResult result = new AppendMessageResult(AppendMessageStatus.PUT_OK, wroteOffset, msgLen, msgId,
                 msgInner.getStoreTimestamp(), queueOffset, CommitLog.this.defaultMessageStore.now() - beginTimeMills);
 
