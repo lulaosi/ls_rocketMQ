@@ -232,6 +232,7 @@ public class MQClientInstance {
                     //ls:拉取nameserver
                     this.serviceState = ServiceState.START_FAILED;
                     // If not specified,looking address from name server
+                    //ls:可以通过动态地址拉取
                     if (null == this.clientConfig.getNamesrvAddr()) {
                         this.mQClientAPIImpl.fetchNameServerAddr();
                     }
@@ -239,6 +240,7 @@ public class MQClientInstance {
                     //ls:开启网络组件
                     this.mQClientAPIImpl.start();
                     // Start various schedule tasks
+                    //ls:开始后台线程任务
                     this.startScheduledTask();
                     // Start pull service
                     //ls:开启拉取消息线程 start
@@ -265,6 +267,8 @@ public class MQClientInstance {
                 @Override
                 public void run() {
                     try {
+                        //ls:定时拉取nameserver列表
+                        //ls:** 是client主动去拉取
                         MQClientInstance.this.mQClientAPIImpl.fetchNameServerAddr();
                     } catch (Exception e) {
                         log.error("ScheduledTask fetchNameServerAddr exception", e);
@@ -278,6 +282,7 @@ public class MQClientInstance {
             @Override
             public void run() {
                 try {
+                    //ls:从nameserver定时更新client的topic路由信息 通过这种方式来感知broker故障
                     MQClientInstance.this.updateTopicRouteInfoFromNameServer();
                 } catch (Exception e) {
                     log.error("ScheduledTask updateTopicRouteInfoFromNameServer exception", e);
@@ -291,6 +296,7 @@ public class MQClientInstance {
             public void run() {
                 try {
                     MQClientInstance.this.cleanOfflineBroker();
+                    //ls:向每一个nameserver上报心跳
                     MQClientInstance.this.sendHeartbeatToAllBrokerWithLock();
                 } catch (Exception e) {
                     log.error("ScheduledTask sendHeartbeatToAllBroker exception", e);

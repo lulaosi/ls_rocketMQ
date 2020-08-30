@@ -48,6 +48,7 @@ public class Producer {
         /*
          * Launch the instance.
          */
+        //ls:开始
         producer.start();
 
         for (int i = 0; i < 1000; i++) {
