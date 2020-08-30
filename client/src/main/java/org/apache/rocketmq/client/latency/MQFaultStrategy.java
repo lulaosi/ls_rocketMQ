@@ -32,6 +32,7 @@ public class MQFaultStrategy {
      * 第一个比 currentLatency 小的索引 index，如果没有找到，返回 0。 然后 根据这个 索 引从 notAvailableDuration数组中取出对应的时间 ，在这个时长内， Broker将设置为不可用。
      */
     //ls:100ms以内算正常
+            //ls:数组
     private long[] latencyMax = {50L, 100L, 550L, 1000L, 2000L, 3000L, 15000L};
     private long[] notAvailableDuration = {0L, 0L, 30000L, 60000L, 120000L, 180000L, 600000L};
 
@@ -70,6 +71,7 @@ public class MQFaultStrategy {
                         pos = 0;
                     MessageQueue mq = tpInfo.getMessageQueueList().get(pos);
                     //ls:验证该队列是否可用
+                    //ls:isAvailable 重试数组时间差
                     if (latencyFaultTolerance.isAvailable(mq.getBrokerName())) {
                         //ls:说明正常可用
                         if (null == lastBrokerName || mq.getBrokerName().equals(lastBrokerName))
