@@ -25,7 +25,7 @@ import org.apache.rocketmq.common.message.MessageQueue;
 public class MQFaultStrategy {
     private final static InternalLogger log = ClientLogger.getLog();
     private final LatencyFaultTolerance<String> latencyFaultTolerance = new LatencyFaultToleranceImpl();
-    //ls:故障延迟机制 默认false
+    //ls:高可用机制 故障延迟机制 默认false
     private boolean sendLatencyFaultEnable = false;
     /**
      * latencyMax，根据 currentLatency 本次消息 发送延迟，从 latencyMax 尾部向前找到
@@ -96,7 +96,7 @@ public class MQFaultStrategy {
 
             return tpInfo.selectOneMessageQueue();
         }
-
+        //ls:如果没有开启高可用,轮询即可
         return tpInfo.selectOneMessageQueue(lastBrokerName);
     }
 

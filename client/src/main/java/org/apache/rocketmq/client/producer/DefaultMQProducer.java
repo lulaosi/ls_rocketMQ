@@ -327,6 +327,7 @@ public class DefaultMQProducer extends ClientConfig implements MQProducer {
         Message msg) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
         Validators.checkMessage(msg, this);
         msg.setTopic(withNamespace(msg.getTopic()));
+        //ls:send
         return this.defaultMQProducerImpl.send(msg);
     }
 
