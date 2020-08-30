@@ -1586,9 +1586,10 @@ public class DefaultMessageStore implements MessageStore {
     class CommitLogDispatcherBuildIndex implements CommitLogDispatcher {
 
         @Override
-        //ls:消息转发 更新indexFile
+        //ls: dispatch 构建indexFile
         public void dispatch(DispatchRequest request) {
             if (DefaultMessageStore.this.messageStoreConfig.isMessageIndexEnable()) {
+                //ls:index
                 DefaultMessageStore.this.indexService.buildIndex(request);
             }
         }
@@ -1988,6 +1989,7 @@ public class DefaultMessageStore implements MessageStore {
                 try {
                     Thread.sleep(1);
                     //ls:独立线程,来更新consumerQueue
+                    //ls:index处理也是用的这个线程
                     this.doReput();
                 } catch (Exception e) {
                     DefaultMessageStore.log.warn(this.getServiceName() + " service has exception. ", e);

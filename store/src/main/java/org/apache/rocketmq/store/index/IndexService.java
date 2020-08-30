@@ -234,6 +234,7 @@ public class IndexService {
                 for (int i = 0; i < keyset.length; i++) {
                     String key = keyset[i];
                     if (key.length() > 0) {
+                        //ls:buildKey
                         indexFile = putKey(indexFile, msg, buildKey(topic, key));
                         if (indexFile == null) {
                             log.error("putKey error commitlog {} uniqkey {}", req.getCommitLogOffset(), req.getUniqKey());
@@ -246,7 +247,7 @@ public class IndexService {
             log.error("build index error, stop building index");
         }
     }
-
+    //ls:构建索引
     private IndexFile putKey(IndexFile indexFile, DispatchRequest msg, String idxKey) {
         for (boolean ok = indexFile.putKey(idxKey, msg.getCommitLogOffset(), msg.getStoreTimestamp()); !ok; ) {
             log.warn("Index file [" + indexFile.getFileName() + "] is full, trying to create another one");
@@ -255,7 +256,7 @@ public class IndexService {
             if (null == indexFile) {
                 return null;
             }
-            //ls:将消息偏移量还有存储时间戳信息放到索引文件
+            //ls:将消息偏移量还有存储时间戳信息放到索引文件 构建索引
             ok = indexFile.putKey(idxKey, msg.getCommitLogOffset(), msg.getStoreTimestamp());
         }
 
