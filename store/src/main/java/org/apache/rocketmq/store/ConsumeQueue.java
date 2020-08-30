@@ -399,6 +399,7 @@ public class ConsumeQueue {
                 }
             }
             //ls:计算出ConumeQueue中的物理地址，将内容追加到 ConsumeQueue 的内存映射文件中
+            //ls:putMessagePositionInfo
             boolean result = this.putMessagePositionInfo(request.getCommitLogOffset(),
                 request.getMsgSize(), tagsCode, request.getConsumeQueueOffset());
             if (result) {
@@ -425,7 +426,7 @@ public class ConsumeQueue {
         log.error("[BUG]consume queue can not write, {} {}", this.topic, this.queueId);
         this.defaultMessageStore.getRunningFlags().makeLogicsQueueError();
     }
-
+    //ls:
     private boolean putMessagePositionInfo(final long offset, final int size, final long tagsCode,
         final long cqOffset) {
 
@@ -475,6 +476,7 @@ public class ConsumeQueue {
                 }
             }
             this.maxPhysicOffset = offset + size;
+            //ls:mappedFileQueue追加映射
             return mappedFile.appendMessage(this.byteBufferIndex.array());
         }
         return false;
