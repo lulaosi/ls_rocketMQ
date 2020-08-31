@@ -828,6 +828,7 @@ public class CommitLog {
         long elapsedTimeInLock = 0;
         //ls:获取文件夹下的最新文件file MappedFile是commitlog的映射
         MappedFile unlockMappedFile = null;
+        //ls:获取内存映射文件
         MappedFile mappedFile = this.mappedFileQueue.getLastMappedFile();
         //ls:自己用CAS实现了自旋锁 在低竞争情况下能够减少上下文切换,ReentrantLock虽然也是CAS,但是会有挂起
         //ls:写消息是串行化的
@@ -839,9 +840,9 @@ public class CommitLog {
             // Here settings are stored timestamp, in order to ensure an orderly
             // global
             msg.setStoreTimestamp(beginLockTimestamp);
-
+            //ls:isFull
             if (null == mappedFile || mappedFile.isFull()) {
-                //ls:构建文件
+                //ls:新建请求
                 mappedFile = this.mappedFileQueue.getLastMappedFile(0); // Mark: NewFile may be cause noise
             }
             if (null == mappedFile) {

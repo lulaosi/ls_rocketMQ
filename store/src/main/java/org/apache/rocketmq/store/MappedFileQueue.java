@@ -39,7 +39,7 @@ public class MappedFileQueue {
     private final String storePath;
 
     private final int mappedFileSize;
-
+    //ls:mappedFiles CopyOnWriteArrayList适合读多写少的情况,snapshot
     private final CopyOnWriteArrayList<MappedFile> mappedFiles = new CopyOnWriteArrayList<MappedFile>();
 
     private final AllocateMappedFileService allocateMappedFileService;
@@ -145,6 +145,7 @@ public class MappedFileQueue {
         }
     }
 
+    //ls:broker启动的时候会将commitlog的数据加载到mappedFile
     public boolean load() {
         File dir = new File(this.storePath);
         File[] files = dir.listFiles();
@@ -161,7 +162,7 @@ public class MappedFileQueue {
 
                 try {
                     //ls:加载commitlog到内存
-                    //ls:MappedFile init方法
+                    //ls:MappedFile init方法 MappedFile
                     MappedFile mappedFile = new MappedFile(file.getPath(), mappedFileSize);
                     //ls:置位
                     mappedFile.setWrotePosition(this.mappedFileSize);
@@ -194,6 +195,7 @@ public class MappedFileQueue {
         return 0;
     }
 
+    //ls:getLastMappedFile
     public MappedFile getLastMappedFile(final long startOffset, boolean needCreate) {
         long createOffset = -1;
         MappedFile mappedFileLast = getLastMappedFile();
@@ -205,7 +207,7 @@ public class MappedFileQueue {
         if (mappedFileLast != null && mappedFileLast.isFull()) {
             createOffset = mappedFileLast.getFileFromOffset() + this.mappedFileSize;
         }
-
+        //ls:创建,使用优先级队列顺带把下一个也创建了
         if (createOffset != -1 && needCreate) {
             String nextFilePath = this.storePath + File.separator + UtilAll.offset2FileName(createOffset);
             String nextNextFilePath = this.storePath + File.separator
@@ -213,6 +215,7 @@ public class MappedFileQueue {
             MappedFile mappedFile = null;
 
             if (this.allocateMappedFileService != null) {
+                //ls:putRequestAndReturnMappedFile
                 mappedFile = this.allocateMappedFileService.putRequestAndReturnMappedFile(nextFilePath,
                     nextNextFilePath, this.mappedFileSize);
             } else {
