@@ -985,8 +985,10 @@ public class CommitLog {
         // Asynchronous flush
         else {
             if (!this.defaultMessageStore.getMessageStoreConfig().isTransientStorePoolEnable()) {
+                //ls:默认方式 mappedFile+pagecache
                 flushCommitLogService.wakeup();
             } else {
+                //ls:堆外内存池的方式
                 commitLogService.wakeup();
             }
         }
@@ -1252,6 +1254,7 @@ public class CommitLog {
         }
 
         @Override
+        //ls:堆外内存池的异步刷盘方式
         public void run() {
             CommitLog.log.info(this.getServiceName() + " service started");
             while (!this.isStopped()) {
@@ -1269,11 +1272,13 @@ public class CommitLog {
                 }
 
                 try {
+                    //ls:将堆外内存刷到虚拟内存中去
                     boolean result = CommitLog.this.mappedFileQueue.commit(commitDataLeastPages);
                     long end = System.currentTimeMillis();
                     if (!result) {
                         this.lastCommitTimestamp = end; // result = false means some data committed.
                         //now wake up flush thread.
+                        //ls:堆外内存的数据取出来之后,再调用常规的mappedFile+pageCache
                         flushCommitLogService.wakeup();
                     }
 
@@ -1295,6 +1300,7 @@ public class CommitLog {
         }
     }
 
+    //ls:异步第一种方式 pagecache
     class FlushRealTimeService extends FlushCommitLogService {
         private long lastFlushTimestamp = 0;
         private long printTimes = 0;
@@ -1303,6 +1309,7 @@ public class CommitLog {
             CommitLog.log.info(this.getServiceName() + " service started");
 
             while (!this.isStopped()) {
+                //ls:数据和时间判断
                 boolean flushCommitLogTimed = CommitLog.this.defaultMessageStore.getMessageStoreConfig().isFlushCommitLogTimed();
 
                 int interval = CommitLog.this.defaultMessageStore.getMessageStoreConfig().getFlushIntervalCommitLog();
@@ -1333,6 +1340,7 @@ public class CommitLog {
                     }
 
                     long begin = System.currentTimeMillis();
+                    //ls:mappedFile调用pagecache进行刷盘
                     CommitLog.this.mappedFileQueue.flush(flushPhysicQueueLeastPages);
                     long storeTimestamp = CommitLog.this.mappedFileQueue.getStoreTimestamp();
                     if (storeTimestamp > 0) {

@@ -303,7 +303,7 @@ public class MappedFile extends ReferenceResource {
         return this.getFlushedPosition();
     }
 
-    //ls:提交
+    //ls:提交到虚拟内存中来
     public int commit(final int commitLeastPages) {
         if (writeBuffer == null) {
             //no need to commit data to file channel, so just regard wrotePosition as committedPosition.
@@ -311,6 +311,7 @@ public class MappedFile extends ReferenceResource {
         }
         if (this.isAbleToCommit(commitLeastPages)) {
             if (this.hold()) {
+
                 //ls:commit
                 commit0(commitLeastPages);
                 this.release();
@@ -338,7 +339,7 @@ public class MappedFile extends ReferenceResource {
                 byteBuffer.position(lastCommittedPosition);
                 byteBuffer.limit(writePos);
                 this.fileChannel.position(lastCommittedPosition);
-                //ls:将buffer中的数据写到磁盘
+                //ls:将堆外内存中的数据写入到虚拟内存中
                 this.fileChannel.write(byteBuffer);
                 this.committedPosition.set(writePos);
             } catch (Throwable e) {
