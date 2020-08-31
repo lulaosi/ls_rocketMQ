@@ -900,6 +900,7 @@ public class CommitLog {
         // Statistics
         storeStatsService.getSinglePutMessageTopicTimesTotal(msg.getTopic()).incrementAndGet();
         storeStatsService.getSinglePutMessageTopicSizeTotal(topic).addAndGet(result.getWroteBytes());
+
         //ls:追加到buffer,映射,这是这是刷盘操作 刷盘
         handleDiskFlush(result, putMessageResult, msg);
         //ls:主从同步
@@ -1415,6 +1416,7 @@ public class CommitLog {
         private volatile List<GroupCommitRequest> requestsWrite = new ArrayList<GroupCommitRequest>();
         private volatile List<GroupCommitRequest> requestsRead = new ArrayList<GroupCommitRequest>();
 
+        //ls:同步刷盘请求
         public synchronized void putRequest(final GroupCommitRequest request) {
             synchronized (this.requestsWrite) {
                 this.requestsWrite.add(request);
@@ -1442,7 +1444,7 @@ public class CommitLog {
                             flushOK = CommitLog.this.mappedFileQueue.getFlushedWhere() >= req.getNextOffset();
 
                             if (!flushOK) {
-                                //ls:flush
+                                //ls:flush flush
                                 CommitLog.this.mappedFileQueue.flush(0);
                             }
                         }

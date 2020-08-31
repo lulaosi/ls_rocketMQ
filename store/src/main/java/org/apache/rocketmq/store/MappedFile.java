@@ -160,7 +160,7 @@ public class MappedFile extends ReferenceResource {
 
         try {
             this.fileChannel = new RandomAccessFile(this.file, "rw").getChannel();
-            //ls:jdk底层 ???
+            //ls:Linux内核
             this.mappedByteBuffer = this.fileChannel.map(MapMode.READ_WRITE, 0, fileSize);
             TOTAL_MAPPED_VIRTUAL_MEMORY.addAndGet(fileSize);
             TOTAL_MAPPED_FILES.incrementAndGet();
@@ -280,10 +280,13 @@ public class MappedFile extends ReferenceResource {
                 int value = getReadPosition();
 
                 try {
+
                     //We only append data to fileChannel or mappedByteBuffer, never both.
                     if (writeBuffer != null || this.fileChannel.position() != 0) {
+                        //ls:force刷盘
                         this.fileChannel.force(false);
                     } else {
+
                         this.mappedByteBuffer.force();
                     }
                 } catch (Throwable e) {
