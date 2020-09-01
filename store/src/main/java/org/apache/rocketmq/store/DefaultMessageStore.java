@@ -174,7 +174,7 @@ public class DefaultMessageStore implements MessageStore {
     /**
      * @throws IOException
      */
-    //ls:重启恢复加载日志和索引文件
+    //ls:重启恢复加载日志和索引文件 recover
     public boolean load() {
         boolean result = true;
 
@@ -200,7 +200,7 @@ public class DefaultMessageStore implements MessageStore {
                     new StoreCheckpoint(StorePathConfigHelper.getStoreCheckpoint(this.messageStoreConfig.getStorePathRootDir()));
                 //ls:加载indexFile
                 this.indexService.load(lastExitOK);
-                //ls:根据lastExitOK文件恢复策略
+                //ls:根据lastExitOK文件恢复策略 recover
                 this.recover(lastExitOK);
 
                 log.info("load over, and the max phy offset = {}", this.getMaxPhyOffset());
@@ -1411,11 +1411,12 @@ public class DefaultMessageStore implements MessageStore {
         long maxPhyOffsetOfConsumeQueue = this.recoverConsumeQueue();
 
         if (lastExitOK) {
+
             this.commitLog.recoverNormally(maxPhyOffsetOfConsumeQueue);
         } else {
             this.commitLog.recoverAbnormally(maxPhyOffsetOfConsumeQueue);
         }
-        //ls:文件恢复
+        //ls:恢复consumequeue
         this.recoverTopicQueueTable();
     }
 
