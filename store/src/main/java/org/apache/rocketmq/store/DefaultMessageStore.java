@@ -1615,10 +1615,10 @@ public class DefaultMessageStore implements MessageStore {
             DefaultMessageStore.log.info("executeDeleteFilesManually was invoked");
         }
 
-        //ls:定时清除
+        //ls:定时删除文件线程
         public void run() {
             try {
-                //ls:清除
+                //ls:清除commitlog queue index
                 this.deleteExpiredFiles();
 
                 this.redeleteHangedFile();
@@ -1636,7 +1636,7 @@ public class DefaultMessageStore implements MessageStore {
             boolean timeup = this.isTimeToDelete();
             boolean spacefull = this.isSpaceToDelete();
             boolean manualDelete = this.manualDeleteFileSeveralTimes > 0;
-
+            //ls:过期,磁盘满
             if (timeup || spacefull || manualDelete) {
 
                 if (manualDelete)
