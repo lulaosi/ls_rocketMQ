@@ -519,7 +519,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
         try {
             String brokerAddr = (null != brokerName) ? this.mQClientFactory.findBrokerAddressInPublish(brokerName)
                     : RemotingHelper.parseSocketAddressAddr(msg.getStoreHost());
-            //ls:ack consumerSendMessageBack
+            //ls:consumerSendMessageBack
             this.mQClientFactory.getMQClientAPIImpl().consumerSendMessageBack(brokerAddr, msg,
                     this.defaultMQPushConsumer.getConsumerGroup(), delayLevel, 5000, getMaxReconsumeTimes());
         } catch (Exception e) {
@@ -574,6 +574,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
     }
 
     //ls:start impl
+    //ls:消息消费start
     public synchronized void start() throws MQClientException {
         switch (this.serviceState) {
             case CREATE_JUST:
@@ -582,6 +583,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                 this.serviceState = ServiceState.START_FAILED;
 
                 this.checkConfig();
+
                 //ls:获取订阅信息
                 this.copySubscription();
 
@@ -836,6 +838,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
         try {
             //ls:获取订阅信息
             Map<String, String> sub = this.defaultMQPushConsumer.getSubscription();
+            //ls:获取topic信息
             if (sub != null) {
                 for (final Map.Entry<String, String> entry : sub.entrySet()) {
                     final String topic = entry.getKey();
@@ -850,7 +853,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
             if (null == this.messageListenerInner) {
                 this.messageListenerInner = this.defaultMQPushConsumer.getMessageListener();
             }
-
+            //ls:获取retry topic
             switch (this.defaultMQPushConsumer.getMessageModel()) {
                 case BROADCASTING:
                     break;
