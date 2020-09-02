@@ -434,6 +434,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                 classFilter // class filter
         );
         try {
+            //ls:pullKernelImpl BROKER_SUSPEND_MAX_TIME_MILLIS
             this.pullAPIWrapper.pullKernelImpl(
                     pullRequest.getMessageQueue(),
                     subExpression,
