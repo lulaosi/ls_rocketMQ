@@ -574,7 +574,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
             int timesTotal = communicationMode == CommunicationMode.SYNC ? 1 + this.defaultMQProducer.getRetryTimesWhenSendFailed() : 1;
             int times = 0;
             String[] brokersSent = new String[timesTotal];
-            //ls:times重试次数
+            //ls:times重试次数 重试
             for (; times < timesTotal; times++) {
                 String lastBrokerName = null == mq ? null : mq.getBrokerName();
                 //ls:会去选择一个broker中的queue进行消息发送
@@ -636,6 +636,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                         log.warn(msg.toString());
                         exception = e;
                         switch (e.getResponseCode()) {
+                            //ls:code 重试
                             case ResponseCode.TOPIC_NOT_EXIST:
                             case ResponseCode.SERVICE_NOT_AVAILABLE:
                             case ResponseCode.SYSTEM_ERROR:
